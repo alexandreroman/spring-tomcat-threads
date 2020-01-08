@@ -1,0 +1,12 @@
+---
+applications:
+  - name: spring-tomcat-threads-demo
+    path: target/spring-tomcat-threads-demo.jar
+    random-route: true
+    health-check-type: http
+    health-check-http-endpoint: /actuator/health
+    buildpacks:
+    - java_buildpack
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+ } }'
+      JBP_CONFIG_JMX: '{enabled: true}'
