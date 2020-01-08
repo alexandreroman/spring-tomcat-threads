@@ -23,6 +23,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
+
 @SpringBootApplication
 public class Application {
     public static void main(String[] args) {
@@ -45,5 +50,19 @@ class IndexController {
         }
 
         return "Thread: " + threadName;
+    }
+}
+
+@RestController
+class SystemInfoController {
+    @GetMapping(value = "/systeminfo", produces = MediaType.APPLICATION_JSON_VALUE)
+    Map<String, Object> systemInfo() throws UnknownHostException {
+        final var heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        return Map.of(
+                "availableProcessors", ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors(),
+                "javaVersion", System.getProperty("java.version"),
+                "threadCount", ManagementFactory.getThreadMXBean().getThreadCount(),
+                "hostName", InetAddress.getLocalHost().getCanonicalHostName()
+        );
     }
 }

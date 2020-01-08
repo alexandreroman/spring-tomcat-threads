@@ -23,6 +23,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,5 +40,11 @@ class ApplicationTests {
     void testIndex() {
         final ResponseEntity<String> resp = client.getForEntity("/", String.class);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void testSystemInfo() {
+        final Map<String, Object> values = client.getForObject("/systeminfo", Map.class);
+        assertThat(values).isNotEmpty();
     }
 }
