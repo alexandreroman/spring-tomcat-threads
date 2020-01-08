@@ -16,9 +16,13 @@
 
 package fr.alexandreroman.demos.springtomcatthreads;
 
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,5 +68,22 @@ class SystemInfoController {
                 "threadCount", ManagementFactory.getThreadMXBean().getThreadCount(),
                 "hostName", InetAddress.getLocalHost().getCanonicalHostName()
         );
+    }
+}
+
+@Configuration
+class MetricsConfig {
+    @Bean
+    Gauge runnableThreadCount(MeterRegistry registry) {
+        return Gauge.builder("jvm.threads.runnable", this::computeRunnableThreadCount)
+                .baseUnit("threads")
+                .description("The number of threads in state RUNNABLE")
+                .register(registry);
+    }
+
+    private Number computeRunnableThreadCount() {
+        return Thread.getAllStackTraces().keySet().stream()
+                .filter(t -> t.getState().equals(Thread.State.RUNNABLE))
+                .count();
     }
 }
