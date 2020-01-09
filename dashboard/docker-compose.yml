@@ -1,0 +1,24 @@
+version: "3.2"
+services:
+  prometheus:
+    image: bitnami/prometheus:2
+    ports:
+      - "9090:9090"
+    command:
+      - --log.level=debug
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=1d
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+  grafana:
+    image: bitnami/grafana:6
+    ports:
+      - "3000:3000"
+    volumes:
+      - type: bind
+        source: ./grafana.yml
+        target: /opt/bitnami/grafana/conf/provisioning/datasources/prometheus.yml
+        read_only: true
